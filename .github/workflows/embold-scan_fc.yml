@@ -27,7 +27,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # Step 3: Build the project and run SpotBugs
+      ## Step 3: Build the project and run SpotBugs
       - name: Build with Maven and Run Analysis
         run: mvn -B clean verify -DskipTests
 
