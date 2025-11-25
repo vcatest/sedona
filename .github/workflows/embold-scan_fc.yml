@@ -55,6 +55,7 @@ jobs:
             -d ./embold-data \
             -c ./repository-configuration.json \
             -l ./embold-log \
-            -sh ./embold-scanner-home
+            -sh ./embold-scanner-home \
+            -v
 
 
