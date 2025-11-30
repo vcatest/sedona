@@ -1,8 +1,8 @@
-# .github/workflows/embold-scan.yml
+# .github/workflows/embold-scan_fc.yml
 
 name: Embold Code Quality Scan
 
-# This workflow runs on every push to the 'main' branch
+
 on:
   push:
     branches: [ master ]
@@ -11,25 +11,40 @@ on:
   workflow_dispatch: 
 
 jobs:
-  embold-scan:
-    # Use the latest version of Ubuntu to run the job
+  embold-scan_fc:
+
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Check out your repository code so the workflow can access it
+      # Step 1: Check out your repository code
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      # Step 2: Download and extract the Embold scanner
+      # Step 2: Set up the Java environment
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      ## Step 3: Build the project and run SpotBugs
+      - name: Build with Maven and Run Analysis
+        run: mvn -B clean verify -DskipTests
+
+      # Step 4: Download and extract the Embold scanner
       - name: Download and Extract Scanner
         run: |
           curl ${{ vars.EMBOLD_SCANNER_URL }} -o browserstack-codequality-scanner-archive.tar.gz
           tar xvf browserstack-codequality-scanner-archive.tar.gz
-      # Step 3: Download the repository configuration file using a secure token
+
+      # Step 5: Download the repository configuration file
       - name: Download Repository Configuration
         run: |
-          curl --silent --location --request GET "${{ vars.EMBOLD_URL_JAVA }}/api/v1/repositories/42715ca2e32bb40ac3e179419ab1c31f/scans/config/download" --header "Authorization: Bearer ${{ secrets.EMBOLD_TOKEN_JAVA }}" -o repository-configuration.json
-      # Step 4: Run the Embold analysis scanner
+          curl --silent --location --request GET "${{ vars.EMBOLD_URL_JAVA }}/api/v1/repositories/470ea4b455f8dec0021b24222d720f14/scans/config/download" --header "Authorization: Bearer ${{ secrets.EMBOLD_TOKEN_JAVA }}" -o repository-configuration.json
+
+      # Step 6: Run the Embold analysis scanner
       - name: Run Embold Scanner
         env:
           EMBOLD_TOKEN: ${{ secrets.EMBOLD_TOKEN_JAVA }}
@@ -37,9 +52,10 @@ jobs:
           ./browserstack-codequality-scanner/bin/embold-scanner analyse \
             -u ${{ vars.EMBOLD_URL_JAVA }} \
             -t $EMBOLD_TOKEN \
-            -r 42715ca2e32bb40ac3e179419ab1c31f \
+            -r 470ea4b455f8dec0021b24222d720f14 \
             -b . \
             -d ./embold-data \
             -c ./repository-configuration.json \
             -l ./embold-log \
-            -sh ./embold-scanner-home
+            -sh ./embold-scanner-home \
+            -v
