@@ -58,6 +58,7 @@
     </scm>
 
     <properties>
+        <sonar.organization>vcatest</sonar.organization>
         <project.scm.id>github</project.scm.id>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>11</java.version>
